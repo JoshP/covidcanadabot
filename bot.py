@@ -16,12 +16,12 @@ bot.
 """
 import logging
 import requests
+import os
 
 from uuid import uuid4
 
 from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageContent, Update
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler, CallbackContext
-from telegram.utils.helpers import escape_markdown
 
 # Enable logging
 logging.basicConfig(
@@ -81,7 +81,8 @@ def main() -> None:
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1541585244:AAEeRGzglGiI55J3EC1D3kTVeWYYk0Bp5Fo", use_context=True)
+    token = os.getenv('TOKEN');
+    updater = Updater(token, use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
