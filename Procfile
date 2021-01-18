@@ -1,1 +1,1 @@
-web: python3 send_updates.py
+worker: python3 send_updates.py
