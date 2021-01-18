@@ -48,7 +48,7 @@ def send_update(context: CallbackContext, province_data):
 """
     logger.info(info)
     context.bot.send_message(chat_id=os.getenv('CHANNEL_ID'), text=info)
-    last_message_sent=province_data["date"])
+    last_message_sent=province_data["date"]
 
 def main() -> None:
     token = os.getenv('TOKEN');
