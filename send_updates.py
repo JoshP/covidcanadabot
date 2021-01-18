@@ -17,6 +17,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+last_message_sent="none"
+
 def get_covid_info(province):
     url = 'https://api.covid19tracker.ca/summary/split'
     response = requests.get(url)
@@ -27,8 +29,7 @@ def get_covid_info(province):
             return province_data
 
 def has_data_been_sent(today):
-    f = open('workfile', 'r')
-    return (f.read() == today)
+    return (last_message_sent == today)
     
 def check_new_updates(context: CallbackContext):
     province_data = get_covid_info("BC")
@@ -47,18 +48,12 @@ def send_update(context: CallbackContext, province_data):
 """
     logger.info(info)
     context.bot.send_message(chat_id=os.getenv('CHANNEL_ID'), text=info)
-
-    f = open('workfile', 'w+')
-    f.write(province_data["date"])
-    f.close()
+    last_message_sent=province_data["date"])
 
 def main() -> None:
     token = os.getenv('TOKEN');
     updater = Updater(token, use_context=True)
     
-    if not os.path.exists('workfile'):
-        open('workfile', 'w').close()
-
     job_queue = updater.job_queue
     recurring_job = job_queue.run_repeating(check_new_updates, interval=60, first=10)
     
