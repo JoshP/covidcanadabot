@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# TODO: use better persistent store like DB to keep track of which updates are sent
+# TODO: switch to https://api.covid19tracker.ca/reports/province/bc?after=2021-01-15 so that we can get sat/sun updates instead of just monday
+
 import logging
 import requests
 import os
@@ -48,6 +51,7 @@ def send_update(context: CallbackContext, province_data):
 """
     logger.info(info)
     context.bot.send_message(chat_id=os.getenv('CHANNEL_ID'), text=info)
+    global last_message_sent
     last_message_sent=province_data["date"]
 
 def main() -> None:
