@@ -6,9 +6,10 @@
 import logging
 import requests
 import os
+import pytz
 
 from uuid import uuid4
-from datetime import date
+from datetime import datetime, timezone
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
@@ -20,7 +21,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-last_message_sent="none"
+last_message_sent="2020-01-22"
 
 def get_covid_info(province):
     url = 'https://api.covid19tracker.ca/summary/split'
@@ -36,7 +37,7 @@ def has_data_been_sent(today):
     
 def check_new_updates(context: CallbackContext):
     province_data = get_covid_info("BC")
-    today = date.today().strftime("%Y-%m-%d")
+    today = datetime.now(pytz.timezone('US/Pacific')).strftime("%Y-%m-%d")
     if (province_data["date"] == today and province_data["change_cases"] != None):
         logger.info("Change cases updated: %s", province_data["change_cases"])
         sent_already = has_data_been_sent(today)
