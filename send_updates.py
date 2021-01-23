@@ -21,7 +21,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-last_message_sent="2020-01-22"
+last_message_sent="2021-01-22"
 
 def get_covid_info(province):
     url = 'https://api.covid19tracker.ca/summary/split'
