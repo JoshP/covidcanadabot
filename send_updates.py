@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # TODO: use better persistent store like DB to keep track of which updates are sent
-# TODO: switch to https://api.covid19tracker.ca/reports/province/bc?after=2021-01-15 so that we can get sat/sun updates instead of just monday
 
 import logging
 import requests
@@ -17,11 +16,13 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+province = "BC"
+
 # Keeps track of dates we have processed and sent
 dates_sent = {"2021-01-21", "2021-01-22"}
 
 def get_covid_info(province):
-    after = {'after', '2021-01-21'}
+    after = {'after': '2021-01-21'}
     url = 'https://api.covid19tracker.ca/reports/province/' + province
     response = requests.get(url, params=after)
     jsonResponse = response.json()
@@ -31,23 +32,23 @@ def has_data_been_sent(date):
     return date in dates_sent
     
 def check_new_updates(context: CallbackContext):
-    province_data = get_covid_info("BC")
+    province_data = get_covid_info(province)
     for date_data in province_data:
         # change_cases will be null if the API has no data for that date yet
-        if (not has_data_been_sent(province_data["date"]) and province_data["change_cases"] != None):
-            logger.info("Change cases updated: %s", province_data["change_cases"])
-            send_update(context, province_data)
+        if (not has_data_been_sent(date_data["date"]) and date_data["change_cases"] != None):
+            logger.info("Change cases updated: %s", date_data["change_cases"])
+            send_update(context, date_data)
 
-def send_update(context: CallbackContext, province_data):
-    info = f"""{province_data["province"]} - {province_data["date"]} update:
-{province_data["change_cases"]} new cases,
-{province_data["change_fatalities"]} new fatalities,
-{province_data["change_vaccinations"]} new vaccinations.
+def send_update(context: CallbackContext, date_data):
+    info = f"""{province} - {date_data["date"]} update:
+{date_data["change_cases"]} new cases,
+{date_data["change_fatalities"]} new fatalities,
+{date_data["change_vaccinations"]} new vaccinations.
 """
     logger.info(info)
-    # context.bot.send_message(chat_id=os.getenv('CHANNEL_ID'), text=info)
+    context.bot.send_message(chat_id=os.getenv('CHANNEL_ID'), text=info)
     global dates_sent
-    dates_sent.add(province_data["date"])
+    dates_sent.add(date_data["date"])
 
 def main() -> None:
     token = os.getenv('TOKEN');
