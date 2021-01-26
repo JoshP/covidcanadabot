@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 province = "BC"
 DATABASE_URL = os.environ['DATABASE_URL']
-LIVE_MODE = False
+LIVE_MODE = True
 
 def get_covid_info(province):
     after = {'after': '2021-01-21'}
