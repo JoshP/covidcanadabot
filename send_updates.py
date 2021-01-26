@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-# TODO: use better persistent store like DB to keep track of which updates are sent
-
 import logging
 import requests
 import os
+import psycopg2
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
@@ -17,9 +16,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 province = "BC"
-
-# Keeps track of dates we have processed and sent
-dates_sent = {"2021-01-21", "2021-01-22"}
+DATABASE_URL = os.environ['DATABASE_URL']
+LIVE_MODE = False
 
 def get_covid_info(province):
     after = {'after': '2021-01-21'}
@@ -29,7 +27,13 @@ def get_covid_info(province):
     return jsonResponse["data"]
 
 def has_data_been_sent(date):
-    return date in dates_sent
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM reports_sent WHERE date = %s;", (date,))
+    row_exists = cur.fetchone() is not None
+    cur.close()
+    conn.close()
+    return row_exists
     
 def check_new_updates(context: CallbackContext):
     province_data = get_covid_info(province)
@@ -46,16 +50,24 @@ def send_update(context: CallbackContext, date_data):
 {date_data["change_vaccinations"]} new vaccinations.
 """
     logger.info(info)
-    context.bot.send_message(chat_id=os.getenv('CHANNEL_ID'), text=info)
-    global dates_sent
-    dates_sent.add(date_data["date"])
+    if (LIVE_MODE):
+        context.bot.send_message(chat_id=os.getenv('CHANNEL_ID'), text=info)
+    record_sent_update(date_data["date"])
+
+def record_sent_update(date):
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cur = conn.cursor()
+    cur.execute("INSERT INTO reports_sent (date) VALUES (%s);", (date,))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def main() -> None:
-    token = os.getenv('TOKEN');
+    token = os.getenv('TOKEN')
     updater = Updater(token, use_context=True)
     
     job_queue = updater.job_queue
-    recurring_job = job_queue.run_repeating(check_new_updates, interval=60, first=10)
+    job_queue.run_repeating(check_new_updates, interval=60, first=10)
     
     updater.start_polling()
     updater.idle()
