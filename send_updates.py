@@ -39,7 +39,7 @@ def check_new_updates(context: CallbackContext):
     province_data = get_covid_info(province)
     for date_data in province_data:
         # change_cases will be null if the API has no data for that date yet
-        if (not has_data_been_sent(date_data["date"]) and date_data["change_cases"] != None):
+        if (not has_data_been_sent(date_data["date"]) and date_data["change_cases"] != None and date_data["change_cases"] != "0"):
             logger.info("Change cases updated: %s", date_data["change_cases"])
             send_update(context, date_data)
 
