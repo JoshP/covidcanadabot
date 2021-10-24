@@ -4,6 +4,7 @@ import logging
 import requests
 import os
 import psycopg2
+import random
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
