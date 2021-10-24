@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 province = "BC"
 DATABASE_URL = os.environ['DATABASE_URL']
-LIVE_MODE = False
+LIVE_MODE = True
 
 def get_covid_info(province):
     # todo make this startDate dynamic to only look a month in the past
