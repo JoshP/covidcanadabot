@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 province = "BC"
 DATABASE_URL = os.environ['DATABASE_URL']
-LIVE_MODE = True
+LIVE_MODE = False
 
 def get_covid_info(province):
     # todo make this startDate dynamic to only look a month in the past
@@ -49,12 +49,11 @@ def send_update(context: CallbackContext, date_data):
     user_list = ['Dave', 'Erik', 'Graham', 'Josh', 'Peter']
     user_of_the_day = random.choice(user_list)
     info = f"""{province} - {date_data["date"]} update:
-😷 {date_data["change_cases"]} new cases, 
-🪦 {date_data["change_fatalities"]} new fatalities,
-💉 {date_data["change_vaccinations"]} new vaxx,
-🚀 {date_data["change_boosters_1"]} new boosters,
-{date_data["change_vaccinated"]} newly vaxxed,
-{date_data["total_vaccinated"]} total vaxxed,
+😷 f'{date_data["change_cases"]:,}' new cases, 
+🪦 f'{date_data["change_fatalities"]:,}' new fatalities,
+💉 f'{date_data["change_vaccinations"]:,}' new vaxx,
+f'{date_data["change_vaccinated"]:,}' newly fully vaxxed,
+f'{date_data["total_vaccinated"]:,}' total fully vaxxed,
 {round((date_data["total_vaccinated"]*100.00)/4634349, 2)}% vaxxed of eligible.
 🏆 User of the day is {user_of_the_day}!
 """
