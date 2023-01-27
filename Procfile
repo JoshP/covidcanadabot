@@ -1,1 +1,1 @@
-worker: python3 send_updates.py
+worker: python user_of_the_day.py
