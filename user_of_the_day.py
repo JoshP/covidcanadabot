@@ -32,14 +32,18 @@ def send_update(context: CallbackContext):
     remaining_users = [user for user in user_list if user != user_of_the_day]
     loser_of_the_day = random.choice(remaining_users)
 
+    winner_emojis = ['🥇','🏆','🏅','🎉','🎊','🎁','💪','👏','👯','‍⭐️','🎯']
+    winner_emoji = random.choice(winner_emojis)
+
     loser_phrases = ['💩 The loser of the day is', '🤡 The clown of the day is',
                      '🧌 The troll of the day is', '🗞️ The old newz of the day is',
-                     '🐽 The pig of the day is',
-                     '🪳 The cockroach of the day is']
+                     '🐽 The pig of the day is', '🙍‍♀️ The debbie downer of the day is',
+                     '🪳 The cockroach of the day is', 
+                     '🤦‍♂️ The facepalm of the day is', '🫃 The pregnant man of the day is',
+                     '👎🏻 Thumbs down,']
     loser_phrase = f"{random.choice(loser_phrases)} {loser_of_the_day}"
 
-    info = f"""🏆 User of the day is {user_of_the_day}!
-{user_of_the_day} currently has a win percentage of {win_percentage:.2f}%!
+    info = f"""{winner_emoji} User of the day is {user_of_the_day} ({win_percentage})!
 Recent champs: {recent_winners}
 {loser_phrase}.
 """
@@ -70,7 +74,7 @@ def get_win_percentage(username):
     user_wins = int(cur.fetchone()[0])
     cur.close()
     conn.close()
-    return user_wins * 100.0 / total_wins
+    return ("{:#.3g}".format(user_wins/total_wins).lstrip("0"))
 
 
 def get_recent_winners() -> str:
